@@ -7,82 +7,100 @@ import os
 import numpy
 
 
-class webCamera:
-	def __init__(self, resolution=(640, 480), host=("", 7778)):
-		self.resolution = resolution
-		self.host = host
+class VideoSender:
+
+	def __init__(self, port=7778, maxresol=(640, 480), maxqual = 30):
+		self.max_resolution = maxresol
+		self.max_img_quality = maxqual
+		self.host = ("", port)
 		self.setSocket(self.host)
-		self.img_quality = 15
+		self.framebuffer = (-1,None)
+		self.mutex = threading.Lock()
 
-	def setImageResolution(self, resolution):
-		self.resolution = resolution
-
-	def setHost(self, host):
-		self.host = host
+	def push(self, timestamp, frame):
+		self.mutex.acquire()
+		self.framedata = (timestamp, frame)
+		self.mutex.release()
 
 	def setSocket(self, host):
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.socket.bind(self.host)
 		self.socket.listen(5)
-		print("Server running on port:%d" % host[1])
-
-	def recv_config(self, client):
-		info = struct.unpack("!lhh", client.recv(8))
-		if info[0] > 911:  #print(info[0])
-			self.img_quality = int(info[0]) - 911
-			self.resolution = list(self.resolution)
-			self.resolution[0] = info[1]
-			self.resolution[1] = info[2]
-			self.resolution = tuple(self.resolution)
-			return 1
-		else:
-			return 0
+		print("Server running on port %d" % host[1])
 
 	def _processConnection(self, client, addr):
-		if (self.recv_config(client) == 0):
+
+		try:
+			info = struct.unpack("!lhh", client.recv(struct.calcsize("!lhh")))	#RECV quality+911 width height
+		except:
+			client.close()
 			return
-		camera = cv.VideoCapture(0)
-		encode_param = [int(cv.IMWRITE_JPEG_QUALITY), self.img_quality]
-		f = open("video_info.txt", 'a+')
-		print("Got connection from %s:%d" % (addr[0], addr[1]), file=f)
-		print("像素为:%d * %d" % (self.resolution[0], self.resolution[1]), file=f)
-		print("打开摄像头成功", file=f)
-		print("连接开始时间:%s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())), file=f)
-		f.close()
-		while (1):
-			time.sleep(0.13)
-			(grabbed, self.img) = camera.read()
-			self.img = cv.resize(self.img, self.resolution)
-			result, imgencode = cv.imencode('.jpg', self.img, encode_param)
-			img_code = numpy.array(imgencode)
-			self.imgdata = img_code.tostring()
+		if info[0] > 911:
+			img_quality = min(info[0]-911,self.max_img_quality)
+			resolution = tuple(min(info[1],self.max_resolution[0]),min(info[2],self.max_resolution[1]))
+			encode_param = [int(cv.IMWRITE_JPEG_QUALITY), img_quality]
+		else:
+			client.close()
+			return
+		client.send(struct.pack("!lhh", img_quality+911, resolution[0], resolution[1]))	#SEND quality+911 width height
+
+		print("Connection from %s:%d" % (addr[0], addr[1]))
+		print("Resolution: %d * %d" % (resolution[0], resolution[1]))
+		print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+
+		while 1:	#LOOP
+
 			try:
-				client.send(
-					struct.pack("!lhh", len(self.imgdata), self.resolution[0],
-								self.resolution[1]) + self.imgdata)
-				#发送图片信息(图片长度,分辨率,图片内容)
+				request = client.recv(struct.calcsize("!q"))	#RECV reqtstp
 			except:
-				f = open("video_info.txt", 'a+')
-				print("%s:%d disconnected!" % (addr[0], addr[1]), file=f)
-				print("连接结束时间:%s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())), file=f)
-				print("****************************************", file=f)
-				camera.release()
-				f.close()
+				client.close()
+				print("%s:%d disconnected" % (addr[0], addr[1]))
+				print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+				return
+			reqtstp = struct.unpack("!q",request)[0]
+
+			while 1:
+				self.mutex.acquire()
+				timestamp = self.framedata[0]
+				self.mutex.release()
+				if timestamp >= reqtstp:
+					break
+				time.sleep((reqtstp-timestamp)/1000)
+
+			self.mutex.acquire()
+			timestamp = self.framedata[0]
+			img = self.framedata[1]
+			self.mutex.release()
+			img = cv.resize(img, resolution)
+			result, imgencode = cv.imencode('.jpg', img, encode_param)
+			imgdata = numpy.array(imgencode).tostring()
+
+			try:
+				client.send(struct.pack("!lq", len(imgdata), timestamp) + imgdata)	#SEND length timestamp data
+			except:
+				client.close()
+				print("%s:%d disconnected" % (addr[0], addr[1]))
+				print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
 				return
 
-	def run(self):
-		while (1):
+	def _processListening(self):
+		while 1:
 			client, addr = self.socket.accept()
 			clientThread = threading.Thread(target=self._processConnection, args=(client, addr))
-			#有客户端连接时产生新的线程进行处理
 			clientThread.start()
 
+	def start(self):
+		self.listeningThread = threading.Thread(target=self._processListening)
+		self.listeningThread.start()
+		return self
 
+'''
 def main():
-	cam = webCamera()
+	cam = Sender()
 	cam.run()
 
 
 if __name__ == "__main__":
 	main()
+'''

@@ -1,0 +1,5 @@
+{
+	"video.location": "127.0.0.1:7778",
+	"video.max-resolution": [640,480],
+	"video.max-quality": 30
+}
