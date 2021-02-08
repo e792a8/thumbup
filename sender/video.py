@@ -16,6 +16,7 @@ class VideoSender:
 		self.setSocket(self.host)
 		self.framebuffer = (-1,None)
 		self.mutex = threading.Lock()
+		self.running = False
 
 	def push(self, timestamp, frame):
 		self.mutex.acquire()
@@ -49,7 +50,7 @@ class VideoSender:
 		print("Resolution: %d * %d" % (resolution[0], resolution[1]))
 		print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
 
-		while 1:	#LOOP
+		while self.running:	#LOOP
 
 			try:
 				request = client.recv(struct.calcsize("!q"))	#RECV reqtstp
@@ -60,7 +61,7 @@ class VideoSender:
 				return
 			reqtstp = struct.unpack("!q",request)[0]
 
-			while 1:
+			while self.running:
 				self.mutex.acquire()
 				timestamp = self.framedata[0]
 				self.mutex.release()
@@ -85,15 +86,23 @@ class VideoSender:
 				return
 
 	def _processListening(self):
-		while 1:
-			client, addr = self.socket.accept()
-			clientThread = threading.Thread(target=self._processConnection, args=(client, addr))
-			clientThread.start()
+		while self.running:
+			try:
+				client, addr = self.socket.accept()
+				clientThread = threading.Thread(target=self._processConnection, args=(client, addr))
+				clientThread.start()
+			except:
+				print("Listening failure")
 
 	def start(self):
+		self.running = True
 		self.listeningThread = threading.Thread(target=self._processListening)
 		self.listeningThread.start()
 		return self
+
+	def stop(self):
+		self.running = False
+		self.socket.close()
 
 '''
 def main():
