@@ -1,11 +1,15 @@
 import socket
 import threading
 import struct
-from aidlearningwrapper import cv
 import time
 import os
 import numpy
 from sender.basesender import BaseSender
+
+try:
+	from aidlearningwrapper import cv
+except ImportError:
+	import cv2 as cv
 
 class VideoSender(BaseSender):
 

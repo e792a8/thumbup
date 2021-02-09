@@ -1,7 +1,11 @@
 from sender import video
-from aidlearningwrapper import cv
 import json
 import time
+
+try:
+	from aidlearningwrapper import cv
+except ImportError:
+	import cv2 as cv
 
 with open("config.json","r",encoding="utf8") as f:
 	config = json.load(f)["video"]
