@@ -4,12 +4,13 @@ import json
 import time
 
 with open("config.json","r",encoding="utf8") as f:
-	config = json.load(f)
+	config = json.load(f)["video"]
 
 vsd = video.VideoSender(
-	port=int(config["video.location"].split(":")[1]),
-	maxresol=tuple(config["video.max-resolution"]),
-	maxqual = config["video.max-quality"]
+	hostport = ("",int(config["location"].split(":")[1]))
+).configure(
+	maxresol = tuple(config["max-resolution"]),
+	maxqual = config["max-quality"]
 ).start()
 
 try:
