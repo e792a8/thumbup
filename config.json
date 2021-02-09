@@ -5,7 +5,7 @@
 		"max-quality": 30
 	},
 	"monitor": {
-		"video-resolution": [640,480],
+		"video-resolution": [480,640],
 		"video-quality": 15
 	}
 }
