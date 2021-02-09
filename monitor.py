@@ -4,13 +4,17 @@ import cv2 as cv
 from getter.video import VideoGetter
 
 with open("config.json","r",encoding="utf8") as f:
-	config = json.load(f)["video"]
+	config = json.load(f)["monitor"]
+	videocfg = json.load(f)["video"]
 
 vgt = VideoGetter(
-	(config["location"].split(":")[0],int(config["location"].split(":")[1]))
+	(videocfg["location"].split(":")[0],int(videocfg["location"].split(":")[1]))
 ).configure(
-	resol = (640,480),
-	qual = 15
+	resol = (
+		min(videocfg["max-resolution"][0],config["video-resolution"][0]),
+		min(videocfg["max-resolution"][1],config["video-resolution"][1])
+	),
+	qual = min(config["video-quality"],videocfg["max-quality"])
 ).start()
 
 tstp = int(time.time()*1000)
