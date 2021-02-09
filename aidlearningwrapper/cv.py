@@ -1,8 +1,12 @@
 from cvs import *
 
-class VideoCapture(cvs.VideoCapture):
+class VideoCapture:
+	def __init__(self, arg):
+		self.realcap = cvs.VideoCapture(arg)
 	def read(self):
-		return (True,super().read())
+		return (True, self.realcap.read())
+	def release(self):
+		pass
 
 imencode = cv2.imencode
 
