@@ -3,5 +3,9 @@
 		"location": "192.168.123.115:7778",
 		"max-resolution": [480,640],
 		"max-quality": 30
+	},
+	"monitor": {
+		"video-resolution": [640,480],
+		"video-quality": 15
 	}
 }
