@@ -61,8 +61,8 @@ class VideoSender(BaseSender):
 			imgdata = numpy.array(imgencode).tostring()
 
 			try:
-				self.sendPack(client, "!lq", (len(imgdata), timestamp))	#SEND length timestamp
-				client.send(imgdata)
+				self.sendPack(client, "!lq", (len(imgdata), timestamp))	#SEND length timestamp image
+				self.sendRaw(client, imgdata)
 			except:
 				self.killClient(client)
 				print("%s:%d disconnected" % (addr[0], addr[1]))

@@ -12,21 +12,29 @@ class BaseSender:
 		self.mutex = threading.Lock()
 		self.running = False
 
-	def configure(self):
-		return self
-		pass
-
 	def push(self, timestamp, frame):
 		self.mutex.acquire()
 		self.dataframe = (timestamp, frame)
 		self.mutex.release()
 
 	def setSocket(self, host):
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		self.socket.bind(self.hostport)
-		self.socket.listen(5)
+		self.listeningSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.listeningSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.listeningSocket.bind(self.hostport)
+		self.listeningSocket.listen(5)
 		print("Server running on port %d" % host[1])
+
+	def recvRaw(self, client, length):
+		data = b""
+		tmp = length
+		while tmp > 0:
+			tmp = length
+			data += client.recv(tmp)
+			tmp = length - len(data)
+		return data
+
+	def sendRaw(self, client, data):
+		client.send(data)
 
 	def recvPack(self, client, format):
 		return struct.unpack(format, client.recv(struct.calcsize(format)))
@@ -37,14 +45,10 @@ class BaseSender:
 	def killClient(self, client):
 		client.close()
 
-	def processClient(self, client, addr):
-		client.close()
-		pass
-
 	def _processListening(self):
 		while self.running:
 			try:
-				client, addr = self.socket.accept()
+				client, addr = self.listeningSocket.accept()
 				clientThread = threading.Thread(target=self.processClient, args=(client, addr))
 				clientThread.start()
 			except:
@@ -59,5 +63,12 @@ class BaseSender:
 
 	def stop(self):
 		self.running = False
-		self.socket.close()
+		self.listeningSocket.close()
 
+	def configure(self):
+		return self
+		pass
+
+	def processClient(self, client, addr):
+		client.close()
+		pass

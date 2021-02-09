@@ -1,57 +1,37 @@
 import socket
-import threading
-import struct
-import os
-import time
-import sys
 import numpy
 import cv2 as cv
-import re
+from getter.basegetter import BaseGetter
 
-class webCamConnect:
-	def __init__(self, resolution = [640,480], remoteAddress = ("127.0.0.1",
-					7778), windowName = "video"):
-		self.remoteAddress = remoteAddress;
-		self.resolution = resolution;
-		self.name = windowName;
-		self.mutex = threading.Lock();
-		self.src=911+15
-		self.interval=0
-		self.path=os.getcwd()
-		self.img_quality = 15
-	def _setSocket(self):
-		self.socket=socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
+class VideoGetter(BaseGetter):
+
+	def configure(self, resol, qual):
+		self.resolution = resol
+		self.quality = qual
+		return self
+
 	def connect(self):
-		self._setSocket();
-		self.socket.connect(self.remoteAddress);
-	def _processImage(self):
-		self.socket.send(struct.pack("!lhh",self.src,self.resolution[0],self.resolution[1]));
-		while(1):
-			info = struct.unpack("!lhh",self.socket.recv(8));
-			bufSize = info[0];
-			if bufSize:
-				try:
-					self.mutex.acquire()
-					self.buf=b''
-					tempBuf=self.buf
-					while(bufSize):
-						tempBuf = self.socket.recv(bufSize);
-						bufSize -= len(tempBuf);
-						self.buf += tempBuf;
-						data = numpy.fromstring(self.buf,dtype='uint8')
-						self.image=cv.imdecode(data,1)
-						cv.imshow(self.name,self.image)
-				except:
-					print("接收失败")
-					pass;
-				finally:
-					self.mutex.release();
-					if cv.waitKey(10) == 27:
-						self.socket.close()
-						cv.destroyAllWindows()
-						print("放弃连接")
-						break
+		self.sendPack("!lhh",(self.quality+911,self.resolution[0],self.resolution[1]))	#SEND quality+911 width height
+		resp = self.recvPack("!lhh")	#RECV quality+911 width height
+		if resp[0] > 911:
+			self.quality = resp[0]-911
+			self.resolution = (resp[1],resp[2])
+		else:
+			raise Exception("Not a valid server")
+		return self
+
+	def recvData(self, timestamp):
+		self.sendPack("!q",(timestamp,))	#SEND reqtstp
+		info = self.recvPack("!lq")	#RECV length timestamp image
+		buffer = self.recvRaw(info[0])
+		self.dataframe = (info[1],cv.imdecode(numpy.fromstring(buffer,dtype='uint8'),1))
+
+	def pull(self, timestamp):
+		while self.dataframe[0] < timestamp:
+			self.recvData(timestamp)
+		return self.dataframe
+
+'''
 	def getData(self, interval):
 		showThread=threading.Thread(target=self._processImage);
 		showThread.start();
@@ -113,3 +93,4 @@ def main():
 	cam.getData(cam.interval);
 if __name__ == "__main__":
 	main();
+'''
