@@ -47,13 +47,11 @@ class VideoSender(BaseSender):
 			while self.running:
 				self.mutex.acquire()
 				timestamp = self.dataframe[0]
-				self.mutex.release()
 				if timestamp >= reqtstp:
 					break
+				self.mutex.release()
 				time.sleep(min(500, reqtstp-timestamp)/1000)
 
-			self.mutex.acquire()
-			timestamp = self.dataframe[0]
 			img = self.dataframe[1]
 			self.mutex.release()
 			img = cv.resize(img, resolution)

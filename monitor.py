@@ -13,11 +13,13 @@ vgt = VideoGetter(
 	qual = 15
 ).start()
 
-tstp = -1
+tstp = int(time.time()*1000)
+print(tstp,"<<<")
 try:
 	while 1:
 		tstp += 1
 		tstp, frame = vgt.pull(tstp)
+		print(tstp)
 		cv.imshow("video",frame)
 		time.sleep(1)
 except KeyboardInterrupt as e:
