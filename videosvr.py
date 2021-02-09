@@ -1,5 +1,5 @@
 from sender import video
-import cv2 as cv
+from aidlearningwrapper import cv
 import json
 import time
 

@@ -1,7 +1,7 @@
 import socket
 import threading
 import struct
-import cv2 as cv
+from aidlearningwrapper import cv
 import time
 import os
 import numpy
