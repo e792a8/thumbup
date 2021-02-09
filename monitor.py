@@ -21,7 +21,9 @@ try:
 		tstp, frame = vgt.pull(tstp)
 		print(tstp)
 		cv.imshow("video",frame)
-		time.sleep(1)
+		if cv.waitKey(1) == ord('q'):
+			break
+		time.sleep(0.05)
 except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	cv.destroyAllWindows()
