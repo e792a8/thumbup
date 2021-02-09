@@ -5,6 +5,7 @@ from getter.video import VideoGetter
 
 with open("config.json","r",encoding="utf8") as f:
 	config = json.load(f)["monitor"]
+with open("config.json","r",encoding="utf8") as f:
 	videocfg = json.load(f)["video"]
 
 vgt = VideoGetter(
