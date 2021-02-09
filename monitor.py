@@ -9,7 +9,7 @@ with open("config.json","r",encoding="utf8") as f:
 vgt = VideoGetter(
 	(config["location"].split(":")[0],int(config["location"].split(":")[1]))
 ).configure(
-	resol = (640,480),
+	resol = (480,640),
 	qual = 15
 ).start()
 
