@@ -1,4 +1,5 @@
-from sender import video
+from sender.video import VideoSender
+from provider.video import VideoProvider
 import json
 import time
 
@@ -10,7 +11,7 @@ except ImportError:
 with open("config.json","r",encoding="utf8") as f:
 	config = json.load(f)["video"]
 
-vsd = video.VideoSender(
+vsd = VideoSender(
 	hostport = ("",int(config["location"].split(":")[1]))
 ).configure(
 	maxresol = tuple(config["max-resolution"]),
@@ -18,13 +19,13 @@ vsd = video.VideoSender(
 ).start()
 
 try:
-	cap = cv.VideoCapture(0)
+	vpd = VideoProvider(0)
 	while 1:
-		result = cap.read()
+		result = vpd.getFrame()
 		if result[0]:
 			vsd.push(int(1000*time.time()), cv.rotate(result[1],cv.ROTATE_90_COUNTERCLOCKWISE))
 		time.sleep(0.005)
 except KeyboardInterrupt as e:
-	print("Keyboard interruption")
-	cap.release()
+	print("Keyboard interrupt")
+	vpd.stop()
 	vsd.stop()
