@@ -59,20 +59,32 @@ class BaseSender:
 	def recvRaw(self, client, length):
 		data = b""
 		tmp = length
-		while tmp > 0:
-			tmp = length
-			data += client.recv(tmp)
-			tmp = length - len(data)
+		try:
+			while tmp > 0:
+				data += client.recv(tmp)
+				tmp = length - len(data)
+		except:
+			print("Recv failing")
+			return False
 		return data
 
 	def sendRaw(self, client, data):
-		client.send(data)
+		try:
+			client.send(data)
+		except:
+			print("Send failing")
+			return False
+		return True
 
 	def recvPack(self, client, format):
-		return struct.unpack(format, client.recv(struct.calcsize(format)))
+		raw = self.recvRaw(client, struct.calcsize(format))
+		if raw == False:
+			return False
+		return struct.unpack(format, raw)
 
 	def sendPack(self, client, format, lst):
-		client.send(struct.pack(format, *lst))
+		result = self.sendRaw(client, struct.pack(format, *lst))
+		return result
 
 	def killClient(self, client):
 		client.close()

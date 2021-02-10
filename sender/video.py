@@ -16,19 +16,14 @@ class VideoSender(BaseSender):
 
 	def processClient(self, client, addr):
 
-		try:
-			info = self.recvPack(client, "!lhh")	#RECV quality+911 width height
-		except:
+		info = self.recvPack(client, "!lhh")	#RECV quality width height
+		if info == False:
 			self.killClient(client)
 			return
-		if info[0] > 911:
-			img_quality = min(info[0]-911,self.max_img_quality)
-			resolution = (min(info[1],self.max_resolution[0]),min(info[2],self.max_resolution[1]))
-			encode_param = [int(cv.IMWRITE_JPEG_QUALITY), img_quality]
-		else:
-			self.killClient(client)
-			return
-		self.sendPack(client, "!lhh", (img_quality+911, resolution[0], resolution[1]))	#SEND quality+911 width height
+		img_quality = min(info[0],self.max_img_quality)
+		resolution = (min(info[1],self.max_resolution[0]),min(info[2],self.max_resolution[1]))
+		encode_param = [int(cv.IMWRITE_JPEG_QUALITY), img_quality]
+		self.sendPack(client, "!lhh", (img_quality, resolution[0], resolution[1]))	#SEND quality width height
 
 		print("Connection from %s:%d" % (addr[0], addr[1]))
 		print("Resolution: %d * %d" % (resolution[0], resolution[1]))
@@ -36,12 +31,9 @@ class VideoSender(BaseSender):
 
 		while self.running:	#LOOP
 
-			try:
-				reqtstp = self.recvPack(client, "!q")[0]	#RECV reqtstp
-			except:
+			reqtstp = self.recvPack(client, "!q")[0]	#RECV reqtstp
+			if reqtstp == False:
 				self.killClient(client)
-				print("%s:%d disconnected" % (addr[0], addr[1]))
-				print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
 				return
 
 			timestamp, img = self.seekFrame(reqtstp)
@@ -49,11 +41,9 @@ class VideoSender(BaseSender):
 			result, imgencode = cv.imencode('.jpg', img, encode_param)
 			imgdata = numpy.array(imgencode).tostring()
 
-			try:
-				self.sendPack(client, "!lq", (len(imgdata), timestamp))	#SEND length timestamp image
-				self.sendRaw(client, imgdata)
-			except:
+			if (
+				False == self.sendPack(client, "!lq", (len(imgdata), timestamp))	#SEND length timestamp image
+				or False == self.sendRaw(client, imgdata)
+			):
 				self.killClient(client)
-				print("%s:%d disconnected" % (addr[0], addr[1]))
-				print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
 				return
