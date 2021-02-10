@@ -48,16 +48,7 @@ class VideoSender(BaseSender):
 				print("At %s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
 				return
 
-			while self.running:
-				self.mutex.acquire()
-				timestamp = self.dataframe[0]
-				if timestamp >= reqtstp:
-					break
-				self.mutex.release()
-				time.sleep(min(500, reqtstp-timestamp)/1000)
-
-			img = self.dataframe[1]
-			self.mutex.release()
+			timestamp, img = self.seekFrame(reqtstp)
 			img = cv.resize(img, resolution)
 			result, imgencode = cv.imencode('.jpg', img, encode_param)
 			imgdata = numpy.array(imgencode).tostring()

@@ -25,8 +25,3 @@ class VideoGetter(BaseGetter):
 		info = self.recvPack("!lq")	#RECV length timestamp image
 		buffer = self.recvRaw(info[0])
 		self.dataframe = (info[1],cv.imdecode(numpy.fromstring(buffer,dtype='uint8'),cv.IMREAD_COLOR))
-
-	def pull(self, timestamp):
-		while self.dataframe[0] < timestamp:
-			self.recvData(timestamp)
-		return self.dataframe

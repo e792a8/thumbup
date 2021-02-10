@@ -5,16 +5,48 @@ import socket
 
 class BaseSender:
 
-	def __init__(self, hostport=("",7778)):
+	def __init__(self, hostport=("",7778), cachesize = 100):
 		self.hostport = hostport
 		self.setSocket(self.hostport)
-		self.dataframe = (-1,None)
+		self.framecache = []
+		self.cachesize = cachesize
 		self.mutex = threading.Lock()
 		self.running = False
 
+	def seekFrame(self, timestamp):
+		self.mutex.acquire()
+		if timestamp == -1:
+			result = self.framecache[-1]
+			self.mutex.release()
+			return result
+		if timestamp > self.framecache[-1][0]:
+			latest = self.framecache[-1][0]
+			while self.running:
+				self.mutex.release()
+				time.sleep((timestamp-latest)/1000)
+				self.mutex.acquire()
+				latest = self.framecache[-1][0]
+				if latest >= timestamp:
+					result = self.dataframe[-1]
+					self.mutex.release()
+					return result
+		l = 0
+		r = len(self.framecache)-1
+		while l < r:
+			m = (l+r)//2
+			if timestamp > self.framecache[m][0]:
+				l = m + 1
+			else:
+				r = m
+		result = self.framecache[m]
+		self.mutex.release()
+		return result
+
 	def push(self, timestamp, frame):
 		self.mutex.acquire()
-		self.dataframe = (timestamp, frame)
+		if len(self.framecache) >= self.cachesize:
+			del self.framecache[0]
+		self.framecache.append((timestamp, frame))
 		self.mutex.release()
 
 	def setSocket(self, host):
