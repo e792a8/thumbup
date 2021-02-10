@@ -1,11 +1,11 @@
 {
 	"video": {
 		"location": "192.168.123.115:7778",
-		"max-resolution": [480,640],
-		"max-quality": 30
+		"max-resolution": [640,480],
+		"max-quality": 90
 	},
 	"monitor": {
-		"video-resolution": [480,640],
-		"video-quality": 15
+		"video-resolution": [640,480],
+		"video-quality": 90
 	}
 }

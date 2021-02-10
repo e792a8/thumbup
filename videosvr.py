@@ -22,7 +22,7 @@ try:
 	while 1:
 		result = cap.read()
 		if result[0]:
-			vsd.push(int(1000*time.time()), result[1])
+			vsd.push(int(1000*time.time()), cv.rotate(result[1],cv.ROTATE_90_COUNTERCLOCKWISE))
 		time.sleep(0.005)
 except KeyboardInterrupt as e:
 	print("Keyboard interruption")
