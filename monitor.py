@@ -22,8 +22,7 @@ tstp = int(time.time()*1000)
 print(tstp,"<<<")
 try:
 	while 1:
-		tstp += 1
-		tstp, frame = vgt.pull(tstp)
+		tstp, frame = vgt.pull(-1)
 		print(tstp)
 		cv.imshow("video",frame)
 		if cv.waitKey(1) == ord('q'):

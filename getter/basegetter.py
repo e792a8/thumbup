@@ -40,9 +40,11 @@ class BaseGetter:
 		self.socket.close()
 
 	def pull(self, timestamp):
-		if(self.dataframe[0] >= timestamp):
-			return self.dataframe
-		self.recvData(timestamp)
+		if timestamp == -1:
+			self.recvData(-1)
+		elif(self.dataframe[0] < timestamp):
+			self.recvData(timestamp)
+		return self.dataframe
 
 	def configure(self):
 		return self
