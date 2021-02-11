@@ -28,13 +28,22 @@ odg = ObjDetGetter(
 	resolution = (640,480)
 ).start()
 
+def objdetDrawBoxes(frame,lst):
+	for i in lst:
+		h = hash(i[0])
+		colr = (127+(h%127),255-(h%133),127+(3*h%127))
+		cv.rectangle(frame,i[2][0:2],i[2][2:4],colr,3)
+		cv.putText(frame,i[0]+' '+str(i[1]),(i[2][0],i[2][1]-9),cv.FONT_HERSHEY_SIMPLEX,0.5,colr,2)
+
+
 tstp = int(time.time()*1000)
 print(tstp,"<<<")
 try:
 	while 1:
 		tstp, result = odg.pull(-1)
+		result.reverse()
 		tstp, frame = vgt.pull(tstp)
-		print(tstp,result)
+		objdetDrawBoxes(frame,result)
 		cv.imshow("video",frame)
 		if cv.waitKey(1) == ord('q'):
 			break
