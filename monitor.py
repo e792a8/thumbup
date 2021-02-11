@@ -2,11 +2,14 @@ import time
 import json
 import cv2 as cv
 from getter.video import VideoGetter
+from getter.objdet import ObjDetGetter
 
 with open("config.json","r",encoding="utf8") as f:
 	config = json.load(f)["monitor"]
 with open("config.json","r",encoding="utf8") as f:
 	videocfg = json.load(f)["video"]
+with open("config.json","r",encoding="utf8") as f:
+	objdetcfg = json.load(f)["objdet"]
 
 vgt = VideoGetter(
 	(videocfg["location"].split(":")[0],int(videocfg["location"].split(":")[1]))
@@ -18,12 +21,29 @@ vgt = VideoGetter(
 	qual = min(config["video-quality"],videocfg["max-quality"])
 ).start()
 
+odg = ObjDetGetter(
+	hostport = (objdetcfg["location"].split(":")[0],int(objdetcfg["location"].split(":")[1]))
+).configure(
+	fullscore = 1000,
+	resolution = (640,480)
+).start()
+
+def objdetDrawBoxes(frame,lst):
+	for i in lst:
+		h = hash(i[0])
+		colr = (127+(h%127),255-(h%133),127+(3*h%127))
+		cv.rectangle(frame,i[2][0:2],i[2][2:4],colr,3)
+		cv.putText(frame,i[0]+' '+str(i[1]),(i[2][0],i[2][1]-9),cv.FONT_HERSHEY_SIMPLEX,0.5,colr,2)
+
+
 tstp = int(time.time()*1000)
 print(tstp,"<<<")
 try:
 	while 1:
-		tstp, frame = vgt.pull(-1)
-		print(tstp)
+		tstp, result = odg.pull(-1)
+		result.reverse()
+		tstp, frame = vgt.pull(tstp)
+		objdetDrawBoxes(frame,result)
 		cv.imshow("video",frame)
 		if cv.waitKey(1) == ord('q'):
 			break
@@ -32,4 +52,5 @@ except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	cv.destroyAllWindows()
 	vgt.stop()
+	odg.stop()
 	exit(0)
