@@ -24,3 +24,4 @@ except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	vpd.stop()
 	vsd.stop()
+	exit(0)
