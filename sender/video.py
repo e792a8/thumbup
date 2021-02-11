@@ -35,10 +35,11 @@ class VideoSender(BaseSender):
 
 		while self.running:	#LOOP
 
-			reqtstp = self.recvPack(client, "!q")[0]	#RECV reqtstp
-			if reqtstp == False:
+			request = self.recvPack(client, "!q")	#RECV reqtstp
+			if request == False:
 				self.killClient(client)
 				return
+			reqtstp = request[0]
 
 			timestamp, img = self.seekFrame(reqtstp)
 			img = cv.resize(img, resolution)
