@@ -22,7 +22,7 @@ vgt = VideoGetter(
 ).start()
 
 odg = ObjDetGetter(
-	hostport = tuple(objdetcfg["location"].split(":"))
+	hostport = (objdetcfg["location"].split(":")[0],int(objdetcfg["location"].split(":")[1]))
 ).configure(
 	fullscore = 1000,
 	resolution = (640,480)
@@ -43,4 +43,5 @@ except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	cv.destroyAllWindows()
 	vgt.stop()
+	odg.stop()
 	exit(0)

@@ -20,10 +20,10 @@ vgt = VideoGetter(
 ).start()
 
 ods = ObjDetSender(
-	hostport=("",config["location"].split(":")[1])
+	hostport=("",int(config["location"].split(":")[1]))
 ).configure(
 	fullscore = 1000,
-	resolution = tuple(config["video-quality"])
+	resolution = tuple(config["video-resolution"])
 ).start()
 
 odp = ObjDetProvider(0)
