@@ -1,4 +1,7 @@
-import cv2 as cv
+try:
+	from aidlearningwrapper import cv
+except ImportError:
+	import cv2 as cv
 
 class VideoProvider:
 

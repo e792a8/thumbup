@@ -3,6 +3,11 @@ from provider.video import VideoProvider
 import json
 import time
 
+try:
+	from aidlearningwrapper import cv
+except ImportError:
+	import cv2 as cv
+
 with open("config.json","r",encoding="utf8") as f:
 	config = json.load(f)["video"]
 
@@ -18,7 +23,7 @@ try:
 	while 1:
 		result = vpd.getFrame()
 		if result[0]:
-			vsd.push(int(1000*time.time()), result[1])
+			vsd.push(int(1000*time.time()), cv.rotate(result[1],cv.ROTATE_90_COUNTERCLOCKWISE))
 		time.sleep(0.005)
 except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
