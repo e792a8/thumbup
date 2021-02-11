@@ -1,10 +1,11 @@
 from provider.objdet import ObjDetProvider
+from sender.objdet import ObjDetSender
 from getter.video import VideoGetter
 import json
 import time
 
 with open("config.json","r",encoding="utf8") as f:
-	config = json.load(f)["monitor"]
+	config = json.load(f)["objdet"]
 with open("config.json","r",encoding="utf8") as f:
 	videocfg = json.load(f)["video"]
 
@@ -18,14 +19,22 @@ vgt = VideoGetter(
 	qual = min(config["video-quality"],videocfg["max-quality"])
 ).start()
 
+ods = ObjDetSender(
+	hostport=("",config["location"].split(":")[1])
+).configure(
+	fullscore = 1000,
+	resolution = tuple(config["video-quality"])
+).start()
+
 odp = ObjDetProvider(0)
 
 try:
-    while 1:
-        tstp, img = vgt.pull(-1)
-        result = odp.processFrame(img)
-        print(tstp,result)
+	while 1:
+		tstp, img = vgt.pull(-1)
+		result = odp.processFrame(img)
+		ods.push(tstp,result)
+		print(tstp,result)
 except Exception as e:
-    vgt.stop()
-    print(e)
-    exit(0)
+	vgt.stop()
+	print(e)
+	exit(0)

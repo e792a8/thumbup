@@ -6,6 +6,11 @@
 	},
 	"monitor": {
 		"video-resolution": [640,480],
-		"video-quality": 90
+		"video-quality": 30
+	},
+	"objdet": {
+		"location": "192.168.123.115:7779",
+		"video-resolution": [640,480],
+		"video-quality": 45
 	}
 }
