@@ -32,3 +32,4 @@ except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	cv.destroyAllWindows()
 	vgt.stop()
+	exit(0)
