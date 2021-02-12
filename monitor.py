@@ -29,11 +29,14 @@ odg = ObjDetGetter(
 ).start()
 
 def objdetDrawBoxes(frame,lst):
+	hgt,wdh,_ = frame.shape
 	for i in lst:
 		h = hash(i[0])
+		blu = (int(i[2][0]*wdh),int(i[2][1]*hgt))
+		brd = (int(i[2][2]*wdh),int(i[2][3]*hgt))
 		colr = (127+(h%127),255-(h%133),127+(3*h%127))
-		cv.rectangle(frame,i[2][0:2],i[2][2:4],colr,3)
-		cv.putText(frame,i[0]+' '+str(i[1]),(i[2][0],i[2][1]-9),cv.FONT_HERSHEY_SIMPLEX,0.5,colr,2)
+		cv.rectangle(frame,blu,brd,colr,3)
+		cv.putText(frame,i[0]+' '+str(int(1000*i[1])),(blu[0],blu[1]-9),cv.FONT_HERSHEY_SIMPLEX,0.5,colr,2)
 
 
 tstp = int(time.time()*1000)
