@@ -34,7 +34,8 @@ try:
 		result = odp.processFrame(img)
 		ods.push(tstp,result)
 		print(tstp,result)
-except Exception as e:
+except BaseException as e:
 	vgt.stop()
+	ods.stop()
 	print(e)
 	exit(0)

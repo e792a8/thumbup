@@ -15,33 +15,27 @@ class BaseGetter:
 		self.socket.connect(self.hostport)
 
 	def sendRaw(self, data):
-		try:
-			self.socket.send(data)
-		except:
-			print("Send failing")
-			return False
-		return True
+		self.socket.sendall(data)
 
 	def recvRaw(self, length):
 		data = b""
 		tmp = length
-		try:
-			while tmp > 0:
-				data += self.socket.recv(tmp)
-				tmp = length - len(data)
-		except:
-			print("Recv failing")
-			return False
+		while tmp > 0:
+			for i in range(10):
+				buf = self.socket.recv(tmp)
+				if len(buf) > 0:
+					break
+			if len(buf) == 0:
+				raise ConnectionResetError("Connection broken")
+			data += buf
+			tmp = length - len(data)
 		return data
 
 	def sendPack(self, format, lst):
-		result = self.sendRaw(struct.pack(format, *lst))
-		return result
+		self.sendRaw(struct.pack(format, *lst))
 
 	def recvPack(self, format):
 		raw = self.recvRaw(struct.calcsize(format))
-		if raw == False:
-			return False
 		return struct.unpack(format, raw)
 
 	def start(self):
