@@ -59,41 +59,40 @@ class BaseSender:
 	def recvRaw(self, client, length):
 		data = b""
 		tmp = length
-		try:
-			while tmp > 0:
-				data += client.recv(tmp)
-				tmp = length - len(data)
-		except:
-			print("Recv failing")
-			return False
+		while tmp > 0:
+			data += client.recv(tmp)
+			tmp = length - len(data)
 		return data
 
 	def sendRaw(self, client, data):
-		try:
-			client.send(data)
-		except:
-			print("Send failing")
-			return False
-		return True
+		client.sendall(data)
 
 	def recvPack(self, client, format):
 		raw = self.recvRaw(client, struct.calcsize(format))
-		if raw == False:
-			return False
 		return struct.unpack(format, raw)
 
 	def sendPack(self, client, format, lst):
-		result = self.sendRaw(client, struct.pack(format, *lst))
-		return result
+		self.sendRaw(client, struct.pack(format, *lst))
 
 	def killClient(self, client):
 		client.close()
+
+	def _clientDaemon(self, client, addr):
+		print("Connection from",addr)
+		try:
+			self.processClient(client, addr)
+		except BaseException as e:
+			print("Exception occured on client",addr)
+			print(e)
+		self.killClient(client)
+		print(addr,"disconnected")
+		return
 
 	def _processListening(self):
 		while self.running:
 			try:
 				client, addr = self.listeningSocket.accept()
-				clientThread = threading.Thread(target=self.processClient, args=(client, addr))
+				clientThread = threading.Thread(target=self._clientDaemon, args=(client, addr))
 				clientThread.start()
 			except:
 				if self.running:
@@ -114,5 +113,4 @@ class BaseSender:
 		pass
 
 	def processClient(self, client, addr):
-		client.close()
 		pass
