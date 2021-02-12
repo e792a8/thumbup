@@ -35,7 +35,7 @@ def non_max_suppression(scores, boxes, classes, max_boxes=10, min_score_thresh=0
 def box_reshape(boxes,h,w):
 	out = []
 	for i in boxes:
-		out.append((int(i[1]*w),int(i[0]*h),int(i[3]*w),int(i[2]*h))) # l u r d
+		out.append((i[1],i[0],i[3],i[2])) # l u r d
 	return out
 
 
@@ -56,7 +56,6 @@ def run_detection(image):
 	box = tflite.getTensor_Fp32(0).reshape((10,4)) # u l d r
 	box, scores, classes = np.squeeze(box), np.squeeze(scores), np.squeeze(classes + 1).astype(np.int32)
 	out_scores, out_boxes, out_classes = non_max_suppression(scores, box, classes)
-	out_scores = [int(i*1000) for i in out_scores]
 	out_classes = [class_names[i] for i in out_classes]
 	return out_scores, out_boxes, out_classes
 
