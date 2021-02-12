@@ -1,6 +1,6 @@
 {
 	"video": {
-		"location": "192.168.123.64:7778",
+		"location": "192.168.123.115:7778",
 		"max-resolution": [640,480],
 		"max-quality": 90
 	},
