@@ -60,7 +60,13 @@ class BaseSender:
 		data = b""
 		tmp = length
 		while tmp > 0:
-			data += client.recv(tmp)
+			for i in range(10):
+				buf = client.recv(tmp)
+				if len(buf) > 0:
+					break
+			if len(buf) == 0:
+				raise ConnectionResetError("Connection broken")
+			data += buf
 			tmp = length - len(data)
 		return data
 
