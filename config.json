@@ -12,5 +12,10 @@
 		"location": "127.0.0.1:7779",
 		"video-resolution": [640,480],
 		"video-quality": 45
+	},
+	"posedet": {
+		"location": "127.0.0.1:7780",
+		"video-resolution": [640,480],
+		"video-quality": 45
 	}
 }
