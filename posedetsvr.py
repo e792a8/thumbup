@@ -44,6 +44,7 @@ while 1:
 				boxes.append(i[2])
 		result = pdp.processFrame(img, boxes)
 		pds.push(tstp2,list(zip(boxes,result)))
+		print(tstp2,result)
 	except KeyboardInterrupt as e:
 		print(e)
 		pds.stop()
