@@ -24,7 +24,7 @@ try:
 		result = vpd.getFrame()
 		if result[0]:
 			vsd.push(int(1000*time.time()), cv.rotate(result[1],cv.ROTATE_90_COUNTERCLOCKWISE))
-		time.sleep(0.005)
+		time.sleep(0.02)
 except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	vpd.stop()

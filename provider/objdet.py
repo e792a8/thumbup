@@ -73,3 +73,11 @@ class ObjDetProvider:
 	def processFrame(self, img):
 		result = once_object_detection(img)
 		return result # [(class, score, (box)), ...]
+
+if __name__ == "__main__":
+	cap = cv2.VideoCapture(0)
+	try:
+		while 1:
+			print(once_object_detection(cap.read()[1]))
+	except:
+		cap.release()
