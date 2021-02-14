@@ -66,8 +66,17 @@ def once_object_detection(frame):
 	image_data = preprocess_image_for_tflite_uint8(frame, model_image_size=300)
 	out_scores, out_boxes, out_classes = run_detection(image_data)
 	out_boxes = box_reshape(out_boxes,h,w)
-	return list(zip(out_classes, out_scores, out_boxes))
-
+	preresult = list(zip(out_classes, out_scores, out_boxes))
+	result = []
+	for i in preresult:
+		if i[2][0]<i[2][2] and i[2][1]<i[2][3]:
+			for j in range(4):
+				if i[2][j]<0.0:
+					i[2][j] = 0.0
+				elif i[2][j]>1.0:
+					i[2][j] = 1.0
+			result.append(i)
+	return result
 
 class ObjDetProvider:
 	def __init__(self, arg):
