@@ -25,7 +25,6 @@ heatmaps=detection_graph.get_tensor_by_name('heatmap:0')
 offsets=detection_graph.get_tensor_by_name('offset_2:0')
 displacementFwd=detection_graph.get_tensor_by_name('displacement_fwd_2:0')
 displacementBwd=detection_graph.get_tensor_by_name('displacement_bwd_2:0')
-pairs = [[5,6],[5,7],[6,8],[7,9],[8,10],[5,11],[6,12],[11,12],[11,13],[12,14],[13,15],[14,16]]
 
 def adapt_img(img, width, height):
 

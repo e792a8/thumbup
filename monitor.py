@@ -48,9 +48,15 @@ def objdetDrawBoxes(frame,lst):
 def posedetDrawLines(frame,poses):
 	fullh,fullw,_ = frame.shape
 	colors = [[255, 0, 0], [255, 170, 0], [255, 170, 0],[255, 255, 0], [255, 255, 0], [170, 255, 0], [170, 255, 0], [0, 255, 0], [0, 255, 0], [0, 255, 170], [0, 255, 170], [0, 170, 255], [0, 170, 255], [0, 0, 255], [0, 0, 255], [255, 0, 255], [255, 0, 255]]
+	pairs = [[5,6],[5,7],[6,8],[7,9],[8,10],[5,11],[6,12],[11,12],[11,13],[12,14],[13,15],[14,16]]
 	for i in poses:
 		boxw = (i[0][2]-i[0][0])*fullw
 		boxh = (i[0][3]-i[0][1])*fullh
+		for p in pairs:
+			if i[1][p[0]][0]>0 and i[1][p[1]][0]>0:
+				point1 = (int(fullw*i[0][0]+boxw*i[1][p[0]][0]),int(fullh*i[0][1]+boxh*i[1][p[0]][1]))
+				point2 = (int(fullw*i[0][0]+boxw*i[1][p[1]][0]),int(fullh*i[0][1]+boxh*i[1][p[1]][1]))
+				cv.line(frame,point1,point2,(0,0,255),1)
 		for k in range(17):
 			if i[1][k][0] < 0:
 				continue
