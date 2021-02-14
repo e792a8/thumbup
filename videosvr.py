@@ -18,7 +18,9 @@ try:
 	while 1:
 		result = vpd.getFrame()
 		if result[0]:
-			vsd.push(int(1000*time.time()), result[1])
+			tstp = int(1000*time.time())
+			vsd.push(tstp, result[1])
+			print(tstp)
 		time.sleep(0.02)
 except KeyboardInterrupt as e:
 	print("Keyboard interrupt")

@@ -69,13 +69,14 @@ def once_object_detection(frame):
 	preresult = list(zip(out_classes, out_scores, out_boxes))
 	result = []
 	for i in preresult:
-		if i[2][0]<i[2][2] and i[2][1]<i[2][3]:
+		x = list(i[2])
+		if x[0]<x[2] and x[1]<x[3]:
 			for j in range(4):
-				if i[2][j]<0.0:
-					i[2][j] = 0.0
-				elif i[2][j]>1.0:
-					i[2][j] = 1.0
-			result.append(i)
+				if x[j]<0.0:
+					x[j] = 0.0
+				elif x[j]>1.0:
+					x[j] = 1.0
+			result.append((i[0],i[1],tuple(x)))
 	return result
 
 class ObjDetProvider:
