@@ -19,5 +19,5 @@ class PoseDetGetter(BaseGetter):
 		for i in range(num):
 			resp = self.recvPack("!4f34f")	#RESP box pose
 			lst = resp[4:]
-			buffer.append((tuple(resp[0:4]),[(lst[x],lst[x+1]) for x in range(0,17,2)]))
+			buffer.append((tuple(resp[0:4]),[(lst[x],lst[x+1]) for x in range(0,34,2)]))
 		self.dataframe = (tstp, buffer)

@@ -19,7 +19,7 @@ try:
 		result = vpd.getFrame()
 		if result[0]:
 			vsd.push(int(1000*time.time()), result[1])
-		time.sleep(0.005)
+		time.sleep(0.02)
 except KeyboardInterrupt as e:
 	print("Keyboard interrupt")
 	vpd.stop()
