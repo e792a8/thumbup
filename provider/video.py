@@ -9,7 +9,7 @@ class VideoProvider:
 		self.cap = cv.VideoCapture(arg)
 
 	def getFrame(self):
-		return self.cap.read()
+		return cv.rotate(self.cap.read(),cv.ROTATE_90_COUNTERCLOCKWISE)
 
 	def stop(self):
 		self.cap.release()
