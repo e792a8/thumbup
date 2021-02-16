@@ -22,8 +22,8 @@ try:
 			vsd.push(tstp, result[1])
 			print(tstp)
 		time.sleep(0.02)
-except KeyboardInterrupt as e:
-	print("Keyboard interrupt")
+except BaseException as e:
+	print(e)
 	vpd.stop()
 	vsd.stop()
 	exit(0)

@@ -6,8 +6,6 @@ class PoseDetSender(BaseSender):
 		return self
 
 	def processClient(self, client, addr):
-		result = self.recvRaw(client, 4)	#REQ handshake
-		self.sendRaw(client, b"!hhh")	#RESP handshake
 
 		while self.running:	#LOOP
 			req = self.recvPack(client, "!q")	#REQ tstp
