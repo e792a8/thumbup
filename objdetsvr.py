@@ -32,7 +32,7 @@ try:
 		ods.push(tstp,result)
 		print(tstp,result)
 except BaseException as e:
+	print(e)
 	vgt.stop()
 	ods.stop()
-	print(e)
 	exit(0)

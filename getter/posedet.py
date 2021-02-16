@@ -5,11 +5,7 @@ class PoseDetGetter(BaseGetter):
 	def configure(self):
 		return self
 
-	def connect(self):
-		self.sendRaw(b"!hhh")	#REQ handshake
-		resp = self.recvRaw(4)	#RESP handshake
-
-	def recvData(self, timestamp):
+	def recvData(self, timestamp, req):
 		self.sendPack("!q",(timestamp,))	#REQ tstp
 		resp = self.recvPack("!ql")	#RESP tstp num
 		tstp = resp[0]

@@ -10,9 +10,7 @@ class ObjDetSender(BaseSender):
 		return self
 
 	def processClient(self, client, addr):
-		result = self.recvRaw(client, 4)	#RECV fullscore w h
-		self.sendRaw(client, b"!hhh")	#SEND fullscore w h
-		
+
 		while self.running:	#LOOP
 
 			result = self.recvPack(client, "!q")	#RECV reqtstp

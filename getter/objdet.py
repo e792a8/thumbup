@@ -6,11 +6,7 @@ class ObjDetGetter(BaseGetter):
 	def configure(self, fullscore = 1000, resolution = (640,480)):
 		return self
 
-	def connect(self):
-		self.sendRaw(b"!hhh")	#SEND handshake
-		resp = self.recvRaw(4)	#RECV handshake
-
-	def recvData(self, timestamp):
+	def recvData(self, timestamp, req):
 		result = self.sendPack("!q", (timestamp,))	#SEND reqtstp
 		info = self.recvPack("!ql")	#RECV timestamp number
 		tstp = info[0]

@@ -19,17 +19,14 @@ class VideoSender(BaseSender):
 		return self
 
 	def processClient(self, client, addr):
-
-		info = self.recvPack(client, "!lhh")	#RECV quality width height
-		img_quality = min(info[0],self.max_img_quality)
-		resolution = (min(info[1],self.max_resolution[0]),min(info[2],self.max_resolution[1]))
-		encode_param = [int(cv.IMWRITE_JPEG_QUALITY), img_quality]
-		self.sendPack(client, "!lhh", (img_quality, resolution[0], resolution[1]))	#SEND quality width height
+		encode_param = [int(cv.IMWRITE_JPEG_QUALITY), self.max_img_quality]
 
 		while self.running:	#LOOP
 
-			request = self.recvPack(client, "!q")	#RECV reqtstp
+			request = self.recvPack(client, "!qlhh")	#RECV reqtstp quality width height
 			reqtstp = request[0]
+			encode_param[1] = min(request[1],self.max_img_quality)
+			resolution = (min(request[2],self.max_resolution[0]),min(request[3],self.max_resolution[1]))
 
 			timestamp, img = self.seekFrame(reqtstp)
 			img = cv.resize(img, resolution)

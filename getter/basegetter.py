@@ -40,24 +40,20 @@ class BaseGetter:
 
 	def start(self):
 		self.startSocket()
-		self.connect()
 		return self
 
 	def stop(self):
 		self.socket.close()
 
-	def pull(self, timestamp):
+	def pull(self, timestamp, req = ()):
 		if timestamp == -1:
-			self.recvData(-1)
+			self.recvData(-1, req)
 		elif(self.dataframe[0] < timestamp):
-			self.recvData(timestamp)
+			self.recvData(timestamp, req)
 		return self.dataframe
 
 	def configure(self):
 		return self
-		pass
-
-	def connect(self):
 		pass
 
 	def recvData(self, timestamp):
