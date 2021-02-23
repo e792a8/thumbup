@@ -21,7 +21,6 @@ try:
 			tstp = int(1000*time.time())
 			vsd.push(tstp, result[1])
 			print(tstp)
-		time.sleep(0.02)
 except BaseException as e:
 	print(e)
 	vpd.stop()
