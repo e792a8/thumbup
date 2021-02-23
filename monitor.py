@@ -42,7 +42,7 @@ def objdetDrawBoxes(frame,lst):
 		blu = (int(i[2][0]*wdh),int(i[2][1]*hgt))
 		brd = (int(i[2][2]*wdh),int(i[2][3]*hgt))
 		colr = (127+(h%127),255-(h%133),127+(3*h%127))
-		cv.rectangle(frame,blu,brd,colr,3)
+		cv.rectangle(frame,blu,brd,colr,2)
 		cv.putText(frame,i[0]+' '+str(int(1000*i[1])),(blu[0],blu[1]-9),cv.FONT_HERSHEY_SIMPLEX,0.5,colr,2)
 
 def posedetDrawLines(frame,poses):
@@ -61,7 +61,7 @@ def posedetDrawLines(frame,poses):
 			if i[1][k][0] < 0:
 				continue
 			point = (int(fullw*i[0][0]+boxw*i[1][k][0]),int(fullh*i[0][1]+boxh*i[1][k][1]))
-			cv.circle(frame, point, 3, colors[k], -1)
+			cv.circle(frame, point, 2, colors[k], -1)
 
 tstp = int(time.time()*1000)
 print(tstp,"<<<")
